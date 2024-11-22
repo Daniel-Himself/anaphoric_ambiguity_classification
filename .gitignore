@@ -8,3 +8,8 @@ __pycache__/GUI_V2.cpython-312.pyc
 *.spec
 /model_utils/en_core_web_sm
 /model_utils/en_core_web_sm-3.7.1.dist-info
+/processed_data/all_intents_*
+/processed_data/ambiguous_intents_*
+/output/resolved_anaphora_*
+/*/.~lock.*
+view
