@@ -41,6 +41,7 @@ def initialize_en_core_model():
 
 # Process uploaded file and run BERT model
 def run_model(filepath):
+    global output_file_path  # Add this line
     try:
         status_var.set("Processing...")
         df = pd.read_excel(filepath)
@@ -69,10 +70,12 @@ def run_model(filepath):
         status_var.set("Model run complete. Proceeding to NLP processing...")
 
         # Process ambiguous intents and save the resolved anaphora file in the output directory
+        output_file_path = os.path.join(output_dir, f'resolved_anaphora_{timestamp}.csv')  # Add this line
         process_ambiguous_intents(
             os.path.join(processed_data_dir, f'ambiguous_intents_{timestamp}.csv'),
-            os.path.join(output_dir, f'resolved_anaphora_{timestamp}.csv')
+            output_file_path  # Modify this line
         )
+        open_file_button.config(state='normal')  # Enable the button
     except Exception as e:
         status_var.set(f"Error during model run: {str(e)}")
 
@@ -160,6 +163,18 @@ def process_ambiguous_intents(input_path, output_path):
     except Exception as e:
         status_var.set(f"Error during NLP processing: {str(e)}")
 
+def open_output_file():
+    if output_file_path:
+        try:
+            if sys.platform == "win32":
+                os.startfile(output_file_path)
+            elif sys.platform == "darwin":
+                subprocess.call(('open', output_file_path))
+            else:
+                subprocess.call(('xdg-open', output_file_path))
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open file: {e}")
+
 # GUI Functions
 def upload_file():
     global filepath
@@ -175,7 +190,8 @@ def run_pipeline():
     run_model(filepath)
 
 def main():
-    global status_var, pronouns
+    global status_var, pronouns, open_file_button, output_file_path  # Add output_file_path
+    output_file_path = None  # Initialize the variable
     install_requirements()
 
     root = tk.Tk()
@@ -189,18 +205,21 @@ def main():
     run_button = tk.Button(root, text="Run Model", command=run_pipeline)
     run_button.pack()
 
+    open_file_button = tk.Button(root, text="Open Output File", command=open_output_file, state='disabled')
+    open_file_button.pack()
+
     status_label = tk.Label(root, textvariable=status_var)
     status_label.pack()
 
     # Initialize en_core model
     initialize_en_core_model()
 
-    print("NLP model loaded successfully.")
+    print("NLP model loaded successfully")
 
     # Define pronouns
-    pronouns = ["I", "me", "my", "mine", "myself", "you", "your", "yours", "yourself", 
-                "he", "him", "his", "himself", "she", "her", "hers", "herself", 
-                "it", "its", "itself", "we", "us", "our", "ours", "ourselves", 
+    pronouns = ["I", "me", "my", "mine", "myself", "you", "you", "your", "yours", "yourself", 
+                "he", "him", "his", "his", "himself", "she", "her", "her", "hers", "herself", 
+                "it", "it", "its", "itself", "we", "us", "our", "ours", "ourselves", "you", 
                 "you", "your", "yours", "yourselves", "they", "them", "their", "theirs", "themselves"]
 
     # Setup GUI
