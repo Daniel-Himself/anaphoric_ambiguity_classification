@@ -190,12 +190,17 @@ def run_pipeline():
     run_model(filepath)
 
 def main():
-    global status_var, pronouns, open_file_button, output_file_path  # Add output_file_path
+    global status_var, pronouns, open_file_button, output_file_path
     output_file_path = None  # Initialize the variable
     install_requirements()
 
     root = tk.Tk()
-    root.title("Requirement Analyzer")
+    root.title("Requirements Analyzer")
+
+    # Set the window icon
+    logo_path = os.path.join(os.path.dirname(__file__), 'logo.png')
+    logo = tk.PhotoImage(file=logo_path)
+    root.iconphoto(False, logo)
 
     status_var = tk.StringVar()
 
@@ -226,5 +231,6 @@ def main():
     status_var.set("Upload an Excel/CSV file and run the model.")
 
     root.mainloop()
+
 if __name__ == "__main__":
     main()
